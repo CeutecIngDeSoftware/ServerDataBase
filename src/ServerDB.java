@@ -5,23 +5,37 @@ import java.sql.*;
 public class ServerDB {
 	public static void main( String args[] )
 	  {
-		
+		String nombreBaseDeDatos="database";
+		createDB(nombreBaseDeDatos);
+		createTable(nombreBaseDeDatos);
+		int id;
+		String nombre, contra;
+		id = 1;
+		nombre = "jalil";
+		contra = "contra123";
+		if(registerUser(nombreBaseDeDatos, id, nombre, contra)){
+			System.out.println(nombre + " ha sido registrado");
+		}
+		if(login(nombreBaseDeDatos, nombre, contra)){
+			System.out.println(nombre + " inicio sesion");
+		}
+		viewAllUsers(nombreBaseDeDatos);
 	  }
-	public static void viewAllUsers(){
-		System.out.print("viewAllUsers");
+	public static void viewAllUsers(String nameDB){
+		System.out.println("viewAllUsers");
 		Connection c = null;
 	    Statement stmt = null;
 	    try {
 	      Class.forName("org.sqlite.JDBC");
-	      c = DriverManager.getConnection("jdbc:sqlite:database.db");
+	      c = DriverManager.getConnection("jdbc:sqlite:"+ nameDB +".db");
 	      c.setAutoCommit(false);
 	      stmt = c.createStatement();
-	      ResultSet rs = stmt.executeQuery( "SELECT * FROM Users;" );
+	      ResultSet rs = stmt.executeQuery( "SELECT * FROM USER;" );
 	      while ( rs.next() ) {
 	         int id = rs.getInt("id");
 	         String  name = rs.getString("name");
-	         System.out.println("Id: "+id);
-	         System.out.println("Nombre: "+name);
+	         System.out.println("Id: " + id);
+	         System.out.println("Nombre: " + name);
 	      }
 	      rs.close();
 	      stmt.close();
@@ -31,10 +45,10 @@ public class ServerDB {
 	      System.exit(0);
 	    }
 	}
-	public static boolean registerUser(int id,String nombre, String contra){
+	public static boolean registerUser(String nameDB, int id,String nombre, String contra){
 		System.out.println("registerUser...");
 		System.out.println("Buscando usuario");
-		if(login(nombre,contra)){
+		if(login(nameDB, nombre, contra)){
 			System.out.println("Usuario ya existe");
 			return false;
 		}else{
@@ -43,14 +57,15 @@ public class ServerDB {
 		    Statement stmt = null;
 		    try {
 		      Class.forName("org.sqlite.JDBC");
-		      c = DriverManager.getConnection("jdbc:sqlite:database.db");
+		      c = DriverManager.getConnection("jdbc:sqlite:" + nameDB + ".db");
 		      c.setAutoCommit(false);
 		      System.out.println("database.db abierta");
 		      
 		      System.out.println("Registrando usuario");
 		      stmt = c.createStatement();
-		      String sql = "INSERT INTO USERS (ID,NAME,PASS) " +
-		                   "VALUES (1, 'Paul', '32' );"; 
+		      String sql = "INSERT INTO USER (ID,NAME,PASS) " +
+		                   "VALUES (" + id + ", '"+ nombre +"', '" + contra+ "');";
+		      System.out.println(sql);
 		      stmt.executeUpdate(sql);
 		      
 		      stmt.close();
@@ -64,18 +79,18 @@ public class ServerDB {
 		    return true;
 		}
 	}
-	public static boolean login(String nombre, String contra ){
+	public static boolean login(String nameDB, String nombre, String contra ){
 		System.out.println("Login...");
 		Connection c = null;
 	    Statement stmt = null;
 	    try {
 	      Class.forName("org.sqlite.JDBC");
-	      c = DriverManager.getConnection("jdbc:sqlite:database.db");
+	      c = DriverManager.getConnection("jdbc:sqlite:" + nameDB + ".db");
 	      c.setAutoCommit(false);
 	      System.out.println("database.db abierta");
 
 	      stmt = c.createStatement();
-	      ResultSet rs = stmt.executeQuery( "SELECT * FROM Users;" );
+	      ResultSet rs = stmt.executeQuery( "SELECT * FROM USER;" );
 	      System.out.println("Buscando Usuario y contraseña");
 	      while ( rs.next() ) {
 	         int id = rs.getInt("id");
@@ -97,32 +112,32 @@ public class ServerDB {
 	    System.out.println("Login correcto");
 		return false;
 	}
-	public static void createDB(){
-		System.out.print("createDB...");
+	public static void createDB(String nameDB){
+		System.out.println("createDB...");
 		Connection c = null;
 	    try {
 	      Class.forName("org.sqlite.JDBC");
-	      c = DriverManager.getConnection("jdbc:sqlite:database.db");
+	      c = DriverManager.getConnection("jdbc:sqlite:" + nameDB + ".db");
 	      System.out.println("Base de datos database.db creda");
 	    } catch ( Exception e ) {
 	      System.err.println( e.getClass().getName() + ": " + e.getMessage() );
 	      System.exit(0);
 	    }
 	}
-	public static void creatTable(){
-		System.out.print("creatTable...");
+	public static void createTable(String nameDB){
+		System.out.println("createTable...");
 		Connection c = null;
 	    Statement stmt = null;
 	    try {
 	      Class.forName("org.sqlite.JDBC");
-	      c = DriverManager.getConnection("jdbc:sqlite:database.db");
+	      c = DriverManager.getConnection("jdbc:sqlite:" + nameDB + ".db");
 	      System.out.println("database.db abierta");
 	      
 	      stmt = c.createStatement();
-	      String sql = "CREATE TABLE USERS " +
+	      String sql = "CREATE TABLE USER " +
 	                   "(ID INT PRIMARY KEY     NOT NULL," +
 	                   " NAME           TEXT    NOT NULL, " +
-	                   " PASS           TEXT    NOT NULL, ";
+	                   " PASS           TEXT    NOT NULL)";
 	      stmt.executeUpdate(sql);
 	      stmt.close();
 	      c.close();
