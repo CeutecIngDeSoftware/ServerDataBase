@@ -5,8 +5,7 @@ import java.sql.*;
 public class ServerDB {
 	public static void main( String args[] )
 	  {
-		createDB();
-		creatTable();
+		
 	  }
 	public static void viewAllUsers(){
 		System.out.print("viewAllUsers");
