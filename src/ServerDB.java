@@ -1,26 +1,44 @@
 import java.sql.*;
+import java.net.*;
+import java.io.*;
 
 //Tutorial de como usar sqlite http://www.tutorialspoint.com/sqlite/sqlite_java.htm
 
 public class ServerDB {
-	public static void main( String args[] )
+	private Socket          socket   = null;
+    private ServerSocket    server   = null;
+    private DataInputStream streamIn =  null;
+    public static void main( String args[] )
 	  {
-		String nombreBaseDeDatos="database";
-		createDB(nombreBaseDeDatos);
-		createTable(nombreBaseDeDatos);
-		int id;
-		String nombre, contra;
-		id = 1;
-		nombre = "jalil";
-		contra = "contra123";
-		if(registerUser(nombreBaseDeDatos, id, nombre, contra)){
-			System.out.println(nombre + " ha sido registrado");
-		}
-		if(login(nombreBaseDeDatos, nombre, contra)){
-			System.out.println(nombre + " inicio sesion");
-		}
-		viewAllUsers(nombreBaseDeDatos);
+		ServerDB server = new ServerDB(1);
 	  }
+	public ServerDB(int port){
+		try{
+			server = new ServerSocket(port);
+			socket = server.accept();
+			open();
+			boolean done = false;
+			while(!done){
+				try{
+					String line = streamIn.readUTF();
+					System.out.println("linea = " + line);
+					done = line.equals(".bye");
+				}catch(IOException ioe){
+					done = true;
+				}
+				close();
+			}
+		}catch(IOException ioe){
+			System.out.println(ioe);
+		}
+	}
+	public void open() throws IOException{
+		streamIn = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+    }
+	public void close() throws IOException{
+		if (socket != null)    socket.close();
+        if (streamIn != null)  streamIn.close();
+    }
 	public static void viewAllUsers(String nameDB){
 		System.out.println("viewAllUsers");
 		Connection c = null;
@@ -65,7 +83,6 @@ public class ServerDB {
 		      stmt = c.createStatement();
 		      String sql = "INSERT INTO USER (ID,NAME,PASS) " +
 		                   "VALUES (" + id + ", '"+ nombre +"', '" + contra+ "');";
-		      System.out.println(sql);
 		      stmt.executeUpdate(sql);
 		      
 		      stmt.close();
