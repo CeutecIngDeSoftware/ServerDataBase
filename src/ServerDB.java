@@ -10,9 +10,22 @@ public class ServerDB {
     private DataInputStream streamIn =  null;
     public static void main( String args[] )
 	  {
-		ServerDB server = new ServerDB(1);
+    	String Str = new String("login-jalil-contra123");
+    	boolean n = false;
+        System.out.println("Return Value :" );
+        for (String retval: Str.split("-")){
+        	if (n){
+         	   System.out.println(retval);
+            }
+        	if(retval.equals("login")){
+        	   n = true;
+        	}
+        }
+		//ServerDB server = new ServerDB(4343);
 	  }
 	public ServerDB(int port){
+		String name = "";
+		String pass = "";
 		try{
 			server = new ServerSocket(port);
 			socket = server.accept();
@@ -21,8 +34,14 @@ public class ServerDB {
 			while(!done){
 				try{
 					String line = streamIn.readUTF();
-					System.out.println("linea = " + line);
-					done = line.equals(".bye");
+					for (String retval: line.split("-")){
+				         if (retval.equals("login")){
+				        	 
+				         }else{
+				        	 
+				         }
+				         }
+					done = line.equals("bye");
 				}catch(IOException ioe){
 					done = true;
 				}
