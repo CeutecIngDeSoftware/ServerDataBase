@@ -10,37 +10,46 @@ public class ServerDB {
     private DataInputStream streamIn =  null;
     public static void main( String args[] )
 	  {
-    	String Str = new String("login-jalil-contra123");
-    	boolean n = false;
-        System.out.println("Return Value :" );
-        for (String retval: Str.split("-")){
-        	if (n){
-         	   System.out.println(retval);
-            }
-        	if(retval.equals("login")){
-        	   n = true;
-        	}
-        }
-		//ServerDB server = new ServerDB(4343);
+    	String nameDB = "DataBase.db";
+    	createDB(nameDB);
+    	createTable(nameDB);
+		ServerDB server = new ServerDB(nameDB, 4343);
 	  }
-	public ServerDB(int port){
+	public ServerDB(String nameDB, int port){
 		String name = "";
 		String pass = "";
 		try{
 			server = new ServerSocket(port);
 			socket = server.accept();
 			open();
+			int n = 0;
 			boolean done = false;
+	    	boolean login = false;
+	    	boolean sessionStart = false;
 			while(!done){
 				try{
 					String line = streamIn.readUTF();
-					for (String retval: line.split("-")){
-				         if (retval.equals("login")){
-				        	 
-				         }else{
-				        	 
-				         }
-				         }
+			        for (String retval: line.split("-")){
+			        	if (login){
+			        		if(n == 0){
+			        			name = retval;
+			        			n++;
+			        		}
+			        		if(n == 1){
+			        			pass = retval;
+			        			n++;
+			        		}
+			        		if(n == 2){
+			        			if(sessionStart = login(nameDB, name, pass)){
+			        				System.out.println("Inicio de sesion correcto :D");
+			        			}
+			        		}
+			            }
+			        	if(retval.equals("login")){
+			        	   login = true;
+			        	   n = 0;
+			        	}
+			        }
 					done = line.equals("bye");
 				}catch(IOException ioe){
 					done = true;
