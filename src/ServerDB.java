@@ -9,13 +9,14 @@ public class ServerDB {
     private ServerSocket    server   = null;
     private DataInputStream streamIn =  null;
     public static void main( String args[] )
-	  {
-    	String nameDB = "DataBase.db";
+    {
+    	String nameDB = "DataBase";
     	createDB(nameDB);
     	createTable(nameDB);
 		ServerDB server = new ServerDB(nameDB, 4343);
-	  }
+	}
 	public ServerDB(String nameDB, int port){
+		int id = 0;
 		String name = "";
 		String pass = "";
 		try{
@@ -25,31 +26,34 @@ public class ServerDB {
 			int n = 0;
 			boolean done = false;
 	    	boolean login = false;
-	    	boolean sessionStart = false;
+	    	boolean session = false;
 			while(!done){
 				try{
 					String line = streamIn.readUTF();
-			        for (String retval: line.split("-")){
-			        	if (login){
-			        		if(n == 0){
-			        			name = retval;
-			        			n++;
-			        		}
-			        		if(n == 1){
-			        			pass = retval;
-			        			n++;
-			        		}
-			        		if(n == 2){
-			        			if(sessionStart = login(nameDB, name, pass)){
-			        				System.out.println("Inicio de sesion correcto :D");
-			        			}
-			        		}
-			            }
-			        	if(retval.equals("login")){
-			        	   login = true;
-			        	   n = 0;
-			        	}
-			        }
+					for (String retval: line.split("-")){
+						if (login){
+							if(n == 0){
+								name = retval;
+							}
+							if(n == 1){
+								pass = retval;
+								n++;
+							}
+							if(n == 2){
+								session = login(nameDB, name, pass);
+								if(session){
+									System.out.println("Inicio de sesion correcto :D");
+								}else{
+									System.out.println("Inicio de sesion incorrecto D:");
+								}
+							}
+							n++;
+					    }
+						if(retval.equals("login")){
+					    	   login = true;
+					    	   n = 0;
+					    	   }
+					}
 					done = line.equals("bye");
 				}catch(IOException ioe){
 					done = true;
@@ -141,8 +145,9 @@ public class ServerDB {
 	         int id = rs.getInt("id");
 	         String  name = rs.getString("name");
 	         String pass  = rs.getString("pass");
-	         if (name == nombre){
-	        	 if(pass == contra){
+	         if (name.equals(nombre)){
+	        	 if(pass.equals(contra)){
+	        		 System.out.println("Login correcto");
 	        		 return true;
 	        	 }
 	         }
@@ -154,7 +159,7 @@ public class ServerDB {
 	      System.err.println( e.getClass().getName() + ": " + e.getMessage() );
 	      System.exit(0);
 	    }
-	    System.out.println("Login correcto");
+	    System.out.println("Login incorrecto");
 		return false;
 	}
 	public static void createDB(String nameDB){
