@@ -21,7 +21,7 @@ public class ServerDB {
 		String name = "";
 		String pass = "";
 		try{
-			System.out.println("Servisio creado");
+			System.out.println("Socket abierto");
 			server = new ServerSocket(port);
 			System.out.println("Esperando al cliente");
 			socket = server.accept();
