@@ -16,19 +16,24 @@ public class ServerDB {
 		ServerDB server = new ServerDB(nameDB, 4343);
 	}
 	public ServerDB(String nameDB, int port){
+		System.out.println("ServerDB...");
 		int id = 0;
 		String name = "";
 		String pass = "";
 		try{
+			System.out.println("Servisio creado");
 			server = new ServerSocket(port);
+			System.out.println("Esperando al cliente");
 			socket = server.accept();
 			open();
 			int n = 0;
 			boolean done = false;
 	    	boolean login = false;
+	    	boolean register = false;
 	    	boolean session = false;
 			while(!done){
 				try{
+					System.out.println("Esperando el mensaje de el cliente");
 					String line = streamIn.readUTF();
 					for (String retval: line.split("-")){
 						if (login){
@@ -51,6 +56,32 @@ public class ServerDB {
 					    }
 						if(retval.equals("login")){
 					    	   login = true;
+					    	   n = 0;
+					    	   }
+						if (register){
+							if(n == 0){
+								id = Integer.parseInt(retval);
+							}
+							if(n == 1){
+								name = retval;
+								n++;
+							}
+							if(n == 2){
+								pass = retval;
+								n++;
+							}
+							if(n == 3){
+								session = registerUser(nameDB, id, name, pass);
+								if(session){
+									System.out.println("Registro correcto :D");
+								}else{
+									System.out.println("Registro incorrecto D:");
+								}
+							}
+							n++;
+					    }
+						if(retval.equals("register")){
+					    	   register = true;
 					    	   n = 0;
 					    	   }
 					}
